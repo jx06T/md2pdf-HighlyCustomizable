@@ -1,408 +1,48 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import debounce from 'lodash/debounce';
-import { JamChevronCircleDown, JamChevronCircleRight } from "../utils/Icons";
-import type{ StyleConfig } from '../styleTypes';
+import { useState, useCallback, useEffect } from 'react';
+import { NumberInput, ColorInput, StringInput, SelectInput, HSelectInput, BooleanInput, StyleSelector, Section } from './AllInput';
+
+import type { StyleConfig } from '../styleTypes';
 
 
 import defaultStyleConfigJson from "./default.json"
-import createConfirmDialog from './ConfirmDialog';
+import createConfirmDialog from '../utils/ConfirmDialog';
+import { useMdContext } from '../context/MdContext';
 
 const defaultStyleConfig = defaultStyleConfigJson as StyleConfig
 
-// Props 類型定義
-interface NumberInputProps {
-    path: string[];
-    label: string;
-    min?: number;
-    max?: number;
-    step?: number;
-    config: StyleConfig;
-    updateConfig: (path: string[], value: number) => void;
-}
-
-interface ColorInputProps {
-    path: string[];
-    label: string;
-    config: StyleConfig;
-    updateConfig: (path: string[], value: string) => void;
-}
-
-interface StringInputProps {
-    path: string[];
-    label: string;
-    config: StyleConfig;
-    updateConfig: (path: string[], value: string) => void;
-}
-
-interface SelectInputProps {
-    path: string[];
-    label: string;
-    config: StyleConfig;
-    updateConfig: (path: string[], value: string) => void;
-    options: { name: string, value: string }[]
-}
-
-interface BooleanInputProps {
-    path: string[];
-    label: string;
-    tValue?: string;
-    fValue?: string;
-    config: StyleConfig;
-    updateConfig: (path: string[], value: string) => void;
-}
-
-interface SectionProps {
-    title: string;
-    children: React.ReactNode;
-    section: string;
-    // section: keyof typeof defaultStyleConfig;
-    isExpanded: boolean;
-    onToggle: (section: string) => void;
-}
-
-// 工具函數：安全地獲取嵌套值
-const getNestedValue = (obj: any, path: string[]): any => {
-    return path.reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj);
-};
-
-// NumberInput 組件
-const NumberInput: React.FC<NumberInputProps> = ({
-    path,
-    label,
-    min = 0,
-    max = 100,
-    step = 1,
-    config,
-    updateConfig
-}) => {
-    const initialValue = getNestedValue(config, path) ?? 0;
-    const [localValue, setLocalValue] = useState<string>(initialValue.toString());
-
-    useEffect(() => {
-        const initialValue = getNestedValue(config, path) ?? 0;
-        setLocalValue(initialValue)
-    }, [config, path])
-
-    const debouncedUpdate = useCallback(
-        debounce((value: number) => {
-            updateConfig(path, value);
-        }, 300),
-        [path, updateConfig]
-    );
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = e.target.value;
-        setLocalValue(newValue);
-
-        const numberValue = Number(newValue);
-        if (!isNaN(numberValue)) {
-            debouncedUpdate(numberValue);
-        }
-    };
-
-
-    useEffect(() => {
-        updateConfig(path, Number(localValue))
-    }, [])
-
-    const handleBlur = () => {
-        let numberValue = Number(localValue);
-
-        if (isNaN(numberValue)) {
-            numberValue = initialValue;
-        } else {
-            numberValue = Math.min(Math.max(numberValue, min), max);
-        }
-
-        setLocalValue(numberValue.toString());
-        updateConfig(path, numberValue);
-    };
-
+const TextScaler = ({ scale }: { scale: Function }) => {
+    const [multiple, setMultiple] = useState<number>(1);
     return (
         <div className="flex items-center justify-between mb-2">
-            <label className="text-sm">{label}</label>
-            <input
-                type="number"
-                value={localValue}
-                min={min}
-                max={max}
-                step={step}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className="w-20 p-1 border rounded bg-gray-50 h-9"
-            />
-        </div>
-    );
-};
-
-// ColorInput 組件
-const ColorInput: React.FC<ColorInputProps> = ({
-    path,
-    label,
-    config,
-    updateConfig
-}) => {
-    const value = getNestedValue(config, path) ?? '#000000';
-    const [localValue, setLocalValue] = useState(value);
-
-    useEffect(() => {
-        const initialValue = getNestedValue(config, path) ?? '#000000';
-        setLocalValue(initialValue)
-    }, [config, path])
-
-    const debouncedUpdate = useCallback(
-        debounce((value: string) => {
-            updateConfig(path, value);
-        }, 300),
-        [path, updateConfig]
-    );
-
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = e.target.value;
-        setLocalValue(newValue);
-        debouncedUpdate(newValue)
-    };
-
-    useEffect(() => {
-        updateConfig(path, localValue)
-    }, [])
-
-    return (
-        <div className="flex items-center justify-between mb-2">
-            <label className="text-sm">{label}</label>
-            <input
-                type="color"
-                value={localValue}
-                onChange={handleChange}
-                className=" w-24 p-1 \border rounded bg-gray-50 h-9"
-            />
-        </div>
-    );
-};
-
-// StringInput 組件
-const StringInput: React.FC<StringInputProps> = ({
-    path,
-    label,
-    config,
-    updateConfig
-}) => {
-    const value = getNestedValue(config, path) ?? '';
-    const [localValue, setLocalValue] = useState(value);
-
-    useEffect(() => {
-        const initialValue = getNestedValue(config, path) ?? '';
-        setLocalValue(initialValue)
-    }, [config, path])
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = e.target.value;
-        setLocalValue(newValue);
-        updateConfig(path, newValue);
-    };
-
-
-    useEffect(() => {
-        updateConfig(path, localValue)
-    }, [])
-
-    return (
-        <div className="flex items-center justify-between mb-2">
-            <label className="text-sm">{label}</label>
-            <input
-                type="text"
-                value={localValue}
-                onChange={handleChange}
-                className="w-24 p-1 border rounded bg-gray-50 h-9"
-            />
-        </div>
-    );
-};
-
-// SelectInput 組件
-const SelectInput: React.FC<SelectInputProps> = ({
-    path,
-    label,
-    config,
-    options,
-    updateConfig
-}) => {
-    const value = getNestedValue(config, path) ?? '';
-    const [localValue, setLocalValue] = useState(value);
-
-    useEffect(() => {
-        const initialValue = getNestedValue(config, path) ?? '';
-        setLocalValue(initialValue)
-    }, [config, path])
-
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newValue = e.target.value;
-        setLocalValue(newValue);
-        updateConfig(path, newValue);
-    };
-
-    useEffect(() => {
-        updateConfig(path, localValue)
-    }, [])
-
-    return (
-        <div className="flex items-center justify-between mb-2">
-            <label className="text-sm">{label}</label>
-            <select className=" w-24 p-1 \border rounded bg-gray-50 h-9" value={localValue} onChange={handleChange}>
-                {options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                        {option.name}
-                    </option>
-                ))}
-            </select>
-        </div>
-    );
-};
-
-// SelectInput 組件
-function HSelectInput({ value, update }: { value: string, update: Function }) {
-    const options = [
-        { name: "H1", value: "H1" },
-        { name: "H2", value: "H2" },
-        { name: "H3", value: "H3" },
-        { name: "H4", value: "H4" },
-        { name: "H5", value: "H5" },
-        { name: "H6", value: "H6" },
-    ]
-
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newValue = e.target.value;
-        update(newValue);
-    };
-
-    return (
-        <div className="flex items-center justify-between mb-2">
-            <label className="text-sm">{"the heading to configure"}</label>
-            <select className=" w-24 p-1 \border rounded bg-gray-50 h-9" value={value} onChange={handleChange}>
-                {options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                        {option.name}
-                    </option>
-                ))}
-            </select>
-        </div>
-    );
-};
-
-// BooleanInput 組件
-const BooleanInput: React.FC<BooleanInputProps> = ({
-    path,
-    label,
-    config,
-    tValue = "",
-    fValue = "",
-    updateConfig
-}) => {
-    const value = getNestedValue(config, path) ?? false;
-    const [localValue, setLocalValue] = useState(value == tValue);
-
-    useEffect(() => {
-        const initialValue = getNestedValue(config, path) ?? false;
-        setLocalValue(initialValue == tValue)
-    }, [config, path])
-
-    const handleChange = () => {
-        updateConfig(path, ((!localValue) ? tValue : fValue));
-        setLocalValue(!localValue);
-    };
-
-    useEffect(() => {
-        updateConfig(path, (localValue) ? tValue : fValue)
-    }, [])
-
-    return (
-        <div className="flex items-center justify-between mb-2">
-            <label className="text-sm">{label}</label>
-            <div className=' w-24 px-2 pt-[5px] border rounded bg-gray-50 h-9' onClick={handleChange}>
-                <div className={` w-6 h-6 border rounded m-auto ${localValue ? "bg-blue-300" : "bg-gray-200"}`}>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-
-// SelectInput 組件
-function StyleSelector({ handleReset }: { handleReset: (newStyleConfig: StyleConfig) => void }) {
-    const [selectedStyle, setSelectedStyle] = useState<string>("default")
-    const options = [
-        { name: "default", value: "default" },
-        { name: "purple", value: "purple" },
-        { name: "iPad 1", value: "ipad1" },
-    ]
-
-    const handleChange = async () => {
-        try {
-            const response = await fetch(`/presetStyles/${selectedStyle}.json`);
-            if (!response.ok) {
-                throw new Error(`Failed to load ${selectedStyle}`);
-            }
-            const data = await response.json();
-            console.log("Loaded JSON:", data);
-            createConfirmDialog("Reset Config？", "This will override all current styles.", () => handleReset(data), () => { }, "Reset")
-        } catch (error) {
-            console.error("Error loading JSON:", error);
-        }
-    };
-
-    return (
-        <div className="flex items-center justify-between mb-2">
-            <label className="text-sm ">{"Reset To Preset Config"}</label>
-            <div className=' flex space-x-4 items-center'>
-                <select className=" w-24 p-1 \border rounded bg-gray-50 h-9" value={selectedStyle} onChange={(e) => setSelectedStyle(e.target.value)}>
-                    {options.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.name}
-                        </option>
-                    ))}
-                </select>
+            <label className="text-sm ">Scale text</label>
+            <div className=' flex'>
+                <input
+                    type="number"
+                    value={multiple}
+                    min={0.1}
+                    max={10}
+                    step={0.01}
+                    onChange={(e) => setMultiple(parseFloat(e.target.value))}
+                    className="w-16 p-1 mr-2 rounded bg-gray-50 h-9"
+                />
                 <button
-                    onClick={handleChange}
-                    className="w-full px-4 py-2  bg-red-400 text-white rounded hover:bg-red-500"
+                    onClick={() => createConfirmDialog("Scale Text?", `Scale Text ${multiple} times?`, () => scale(multiple), () => { }, "Scale", "Cancel")}
+                    className="px-4 h-9 pb-1 bg-red-400 text-white rounded hover:bg-red-500 w-full"
                 >
-                    Reset to "{selectedStyle}"
+                    Apply
                 </button>
             </div>
-        </div>
-    );
-};
 
-// Section 組件
-const Section: React.FC<SectionProps> = ({
-    title,
-    children,
-    section,
-    isExpanded,
-    onToggle
-}) => (
-    <div className="\border rounded mb-2">
-        <button
-            className="w-full p-2 flex items-center justify-between bg-gray-50 rounded"
-            onClick={() => onToggle(section)}
-        >
-            <span>{title}</span>
-            {isExpanded ?
-                <JamChevronCircleDown className="text-2xl" /> :
-                <JamChevronCircleRight className="text-2xl" />
-            }
-        </button>
-        {isExpanded && (
-            <div className="p-2 px-3">
-                {children}
-            </div>
-        )}
-    </div>
-);
+        </div >
+    )
+}
+
 
 // 主組件
-const StyleConfigPanel: React.FC = () => {
+const StyleConfigPanel = () => {
     const [config, setConfig] = useState(defaultStyleConfig);
+    let { setMdHNConfig, mdHNConfig } = useMdContext()
+
     const [headingToConfigure, setHeadingToConfigure] = useState<string>('H1');
 
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -423,10 +63,13 @@ const StyleConfigPanel: React.FC = () => {
             current = current[path[i]] || {};
         }
         current[path[path.length - 1]] = value;
-        // console.log(path, value)
 
         if (path[path.length - 1] == "title") {
             document.title = value;
+        }
+
+        if (path[0] == "headerNumber") {
+            setMdHNConfig({ ...mdHNConfig, [path[1]]: value })
         }
 
 
@@ -443,6 +86,41 @@ const StyleConfigPanel: React.FC = () => {
         setConfig(newConfig);
     }, [config, setConfig]);
 
+
+    const textSizePaths = [
+        ['page', 'font', 'size'],
+        ['title', 'H1', 'size'],
+        ['title', 'H2', 'size'],
+        ['title', 'H3', 'size'],
+        ['title', 'H4', 'size'],
+        ['title', 'H5', 'size'],
+        ['title', 'H6', 'size'],
+        ['blockquotes', 'scaling'],
+        ['blockquotes', 'titleMargin'],
+        ['blockquotes', 'textScaling'],
+        ...[1, 2, 3, 4, 5].map(n => ['list', 'orderedLists', `scaling${n}`]),
+        ...[1, 2, 3, 4, 5].map(n => ['list', 'unorderedList', `scaling${n}`]),
+        ['list', 'task', 'scaling'],
+    ];
+
+    // 縮放函數
+    const scale = useCallback((multiple: number) => {
+        textSizePaths.forEach(path => {
+            let current: any = config;
+            for (let i = 0; i < path.length - 1; i++) {
+                current = current[path[i]] || {};
+            }
+            const key = path[path.length - 1];
+            const value = current[key];
+            if (typeof value === 'number') {
+                const newValue = Math.round(value * multiple * 100) / 100;
+                updateConfig(path, newValue);
+            }
+        });
+    }, [config, updateConfig]);
+
+
+
     const initializeConfigStyles = useCallback((config: Record<string, any>, basePath: string[] = []) => {
         const traverseConfig = (currentConfig: Record<string, any>, currentPath: string[]) => {
             Object.entries(currentConfig).forEach(([key, value]) => {
@@ -450,7 +128,7 @@ const StyleConfigPanel: React.FC = () => {
 
 
                 if (typeof value === "object" && value !== null) {
-                    traverseConfig(value, newPath); // 递归处理嵌套结构
+                    traverseConfig(value, newPath); // 遞迴
                 } else {
                     const cssVarName = `--${newPath.join('-')}`;
 
@@ -549,17 +227,10 @@ const StyleConfigPanel: React.FC = () => {
                     <NumberInput
                         path={['page', 'font', 'size']}
                         label="Size"
+                        min={1}
                         config={config}
                         updateConfig={updateConfig}
                     />
-                    {/* <NumberInput
-                        path={['page', 'font', 'weight']}
-                        label="Weight"
-                        step={100}
-                        max={3000}
-                        config={config}
-                        updateConfig={updateConfig}
-                    /> */}
                     <SelectInput
                         path={['page', "font", 'weight']}
                         label="Weight"
@@ -588,12 +259,6 @@ const StyleConfigPanel: React.FC = () => {
                         config={config}
                         updateConfig={updateConfig}
                     />
-                    {/* <FontsInput
-                        path={['page', 'font', 'family']}
-                        label="family"
-                        config={config}
-                        updateConfig={updateConfig}
-                    /> */}
                     <SelectInput
                         path={['page', "font", 'familyC']}
                         label="Family C"
@@ -705,6 +370,7 @@ const StyleConfigPanel: React.FC = () => {
                         config={config}
                         updateConfig={updateConfig}
                     />
+                    <TextScaler scale={scale} />
 
                 </Section>
             </Section>
@@ -1236,6 +902,52 @@ const StyleConfigPanel: React.FC = () => {
                     step={1}
                     max={900}
                     min={-900}
+                    config={config}
+                    updateConfig={updateConfig}
+                />
+
+            </Section>
+            <Section
+                title="Header Number Settings"
+                section="headerNumber"
+                isExpanded={expandedSections.headerNumber}
+                onToggle={toggleSection}
+            >
+                <NumberInput
+                    path={['headerNumber', 'minDepth']}
+                    label="Min Depth"
+                    config={config}
+                    updateConfig={updateConfig}
+                    min={1}
+                    max={6}
+                />
+                <NumberInput
+                    path={['headerNumber', 'maxDepth']}
+                    label="Max Depth"
+                    config={config}
+                    updateConfig={updateConfig}
+                    min={1}
+                    max={6}
+                />
+                <SelectInput
+                    path={['headerNumber', 'style']}
+                    label="Style"
+                    config={config}
+                    updateConfig={updateConfig}
+                    options={
+                        [
+                            { name: "none", value: "none" },
+                            { name: "dot", value: "dot" },
+                            { name: "dash", value: "dash" },
+                            { name: "flat", value: "flat" },
+                            { name: "zh", value: "zh" },
+                            { name: "zh_big", value: "zh_big" },
+                        ]
+                    }
+                />
+                <StringInput
+                    path={['headerNumber', 'separator']}
+                    label='Separator'
                     config={config}
                     updateConfig={updateConfig}
                 />

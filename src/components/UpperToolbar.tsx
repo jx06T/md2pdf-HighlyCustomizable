@@ -43,6 +43,7 @@ function UpperToolbar({ editorWidth, setCustomExpandLevel, editorAndSetWidth, di
         }
       </div>
 
+      {/* 預覽區標籤 */}
       <div className=" bg-white pt-2 w-full h-9 space-x-2 flex">
         <label
           onClick={expandLevel > 0 ? () => { } : () => setDisplayId(2)}
@@ -53,7 +54,10 @@ function UpperToolbar({ editorWidth, setCustomExpandLevel, editorAndSetWidth, di
 
         {(maxExpandLevel > 0) &&
           <button
-            onClick={() => setCustomExpandLevel(expandLevel > 0 ? 0 : 1)}
+            onClick={() => {
+              setCustomExpandLevel(expandLevel > 0 ? 0 : 1)
+              setDisplayId(2)
+            }}
             className="pb-2 rounded-md w-9 h-9 ml-2">
             {expandLevel > 0 ?
               <MingcuteArrowToLeftFill className=" text-2xl"></MingcuteArrowToLeftFill> :

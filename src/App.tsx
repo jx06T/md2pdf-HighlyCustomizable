@@ -91,7 +91,9 @@ function App() {
     if (isInit) {
       return
     }
+
     localStorage.setItem('layout', JSON.stringify({ expandLevel, displayId, editorAreaW, editorAndSetAreaW, customExpandLevel }))
+
   }, [expandLevel, displayId, editorAreaW, editorAndSetAreaW, customExpandLevel])
 
 
@@ -122,6 +124,10 @@ function App() {
 
   // ExpandLevel 處理
   useEffect(() => {
+    if (editorAndSetAreaW == 0) {
+      setEditorAndSetAreaW(editorAreaW)
+      setEditorAreaW(editorAreaW - minW)
+    }
     if (customExpandLevel > -1) {
       const newExpandLevel = Math.min(maxExpandLevel, customExpandLevel)
       setExpandLevel(newExpandLevel)
@@ -131,29 +137,35 @@ function App() {
   // Width 調整處理
   useEffect(() => {
     if (maxW < minW + editorAndSetAreaW) {
-      setEditorAndSetAreaW(maxW - minW)
+      setEditorAndSetAreaW(maxW - (1.3 * minW))
     }
     if (maxW < expandLevel * minW + editorAreaW) {
-      setEditorAreaW(maxW - (expandLevel * minW))
+      setEditorAreaW(maxW - (expandLevel > 2 ? 1.3 * minW : 0) - (expandLevel > 1 ? minW : 0))
     }
   }, [maxW, editorAndSetAreaW, editorAreaW, expandLevel, minW])
 
   // 移動處理函數
   const handleMove = (clientX: number): void => {
+    const XOffset = clientX - startXRef.current;
     if (isResizing) {
       if (movingRef.current === 0) {
-        if (editorAndSetAreaW - (startEWRef.current + (clientX - startXRef.current)) < minW && expandLevel > 1) {
-          setEditorAndSetAreaW(Math.min(maxW - minW, Math.max(minW, startEWRef.current + (clientX - startXRef.current) + minW)))
+        if (editorAndSetAreaW - (startEWRef.current + (XOffset)) < minW && expandLevel > 1) {
+          setEditorAndSetAreaW(Math.min(maxW - (1.3 * minW), Math.max(minW, startEWRef.current + (XOffset) + minW)))
         }
-        setEditorAreaW(Math.min(maxW - (expandLevel * minW), Math.max(minW, startEWRef.current + (clientX - startXRef.current))))
+
+        setEditorAreaW(Math.min(maxW - (expandLevel > 1 ? 1 * minW : 0) - (expandLevel > 0 ? 1.3 * minW : 0), Math.max(minW, startEWRef.current + (XOffset))))
+
+        if (maxW - (expandLevel > 1 ? 1 * minW : 0) - (expandLevel > 0 ? 1.3 * minW : 0) < Math.max(minW, startEWRef.current + (XOffset)) && expandLevel === 1) {
+          setEditorAndSetAreaW(0)
+        }
       } else if (movingRef.current === 1) {
-        if (startESWRef.current + (clientX - startXRef.current) < (2 * minW)) {
+        if (startESWRef.current + (XOffset) < (2 * minW)) {
           return
         }
-        if (startESWRef.current + (clientX - startXRef.current) - editorAreaW < minW) {
-          setEditorAreaW(startESWRef.current + (clientX - startXRef.current) - minW)
+        if (startESWRef.current + (XOffset) - editorAreaW < minW) {
+          setEditorAreaW(startESWRef.current + (XOffset) - minW)
         }
-        setEditorAndSetAreaW(Math.min((maxW - minW), Math.max(386, startESWRef.current + (clientX - startXRef.current))))
+        setEditorAndSetAreaW(Math.min((maxW - 1.3 * minW), Math.max(386, startESWRef.current + (XOffset))))
       }
     }
   }

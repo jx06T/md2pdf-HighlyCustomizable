@@ -6,10 +6,10 @@ import rehypeRaw from 'rehype-raw';
 import rehypeKatexNotranslate from 'rehype-katex-notranslate';
 import Markdown from 'react-markdown'
 
-// import { visit } from 'unist-util-visit';
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import rehypeCallouts from 'rehype-callouts'
+import { remarkHeadingNumbering } from '../utils/remarkHeadingNumbering';
 
 // @ts-ignore
 import 'rehype-callouts/theme/github'
@@ -29,6 +29,7 @@ import { monokai } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 import remarkExternalLinks from 'remark-external-links';
 
 import type { ImgHTMLAttributes } from 'react';
+
 
 function getThemeStyle(th: string) {
     switch (th) {
@@ -50,20 +51,21 @@ function getThemeStyle(th: string) {
 }
 
 function processMarkdown(mdValue: string): string {
-    // Only identify and temporarily mark multi-line code blocks to skip them
+    // 找多行代碼塊
     const codeBlockPattern = /```[\s\S]*?```/g;
     const codeBlocks: string[] = [];
 
-    // Replace code blocks with markers and store them
+    // 記錄他們
     const textWithCodeBlocksMarked = mdValue.replace(codeBlockPattern, (match) => {
         const marker = `__CODE_BLOCK_${codeBlocks.length}__`;
         codeBlocks.push(match);
         return marker;
     });
-    // console.log(textWithCodeBlocksMarked)
-    // Apply the replacements to the text (excluding code blocks)
+
+    // 在代碼塊外面處理自訂語法
+
     let processedText = textWithCodeBlocksMarked
-        // Replace <<text at the beginning of a line with <ma>text</ma> with HTML escaping
+        // 註解語法
         .replace(/^<<\s*(.+)$/gm, (_, group1) =>
             `<ma>${group1
                 .replace(/</g, '&lt;')
@@ -71,37 +73,46 @@ function processMarkdown(mdValue: string): string {
                 .replace(/\\/g, '&#92;')
                 .replace(/\//g, '&#47;')}</ma>`
         )
-        // Replace lines with exactly 3 dashes with ---, but longer dash lines with <bpf></bpf>
+
+        // 分頁語法
         .replace(/^([-]{3,})$/gm, (match) =>
             match.length === 3 ? '---' : '<bpf></bpf>'
         )
-        // Replace lines with 2 or more spaces with a line break
+
+        // 強制換行
         .replace(/^ {2,}$/gm, '<br/>\n')
-        // Replace tab characters with &nbsp;
+
+        // tab縮排，排除列表因為我不知道怎麼搞
         .replace(/^( {4})+(?![\*\-\d+\. ])/gm, match => '\n' + '&nbsp;'.repeat(match.length))
 
-    // Restore the code blocks
+    // 回復多行代碼塊，順便幫懶得寫語言的人補上text當作語言
     codeBlocks.forEach((block, index) => {
-        processedText = processedText.replace(`__CODE_BLOCK_${index}__`, block);
+        processedText = processedText.replace(`__CODE_BLOCK_${index}__`, block.replace(/^```(\w?)(?=\s|$)/, '```$1 text'));
     });
 
     return processedText;
 }
 
 function PreviewArea({ width, displayId, expandLevel, initMdValue = '', only = false }: { width: number, displayId: number, expandLevel: number, initMdValue?: string, only?: boolean }) {
-    let { mdValue } = useMdContext()
+    // 自訂解析 MD 的 HTML 標籤
+
+    let { mdValue, mdHNConfig } = useMdContext()
     const [rootPath, setRootPath] = useState("")
     const absoluteRegex = /^(https?:\/\/)/;
 
     const components = {
         p: ({ children, ...props }: { children: React.ReactNode }) => {
+            // 把僅包含換頁符號的 p 標籤弄掉 
             // @ts-ignore
             if (children && children.key && children.key.includes("bpf")) {
                 return <span {...props} children={children} />;
             }
+
             return <p {...props} children={children} />;
+
         },
         img({ src, alt, className, ...props }: ImgHTMLAttributes<HTMLImageElement>) {
+            //  自訂img標籤
             return (
                 <span className={`md-img py-4 ${className || ''}`}>
                     <img
@@ -114,6 +125,7 @@ function PreviewArea({ width, displayId, expandLevel, initMdValue = '', only = f
             );
         },
         bpf: () => {
+            // 換頁符號
             return (
                 <div className="bkp bg-transparent h-8 flex">
                     <span className=" text-gray-300">{'>'}</span>
@@ -123,6 +135,7 @@ function PreviewArea({ width, displayId, expandLevel, initMdValue = '', only = f
             );
         },
         table: ({ children }: { children: React.ReactNode }) => {
+            // 表格
             return (
                 <div className="table-container">
                     <table >
@@ -132,6 +145,7 @@ function PreviewArea({ width, displayId, expandLevel, initMdValue = '', only = f
             );
         },
         ma: ({ children }: { children: React.ReactNode }) => {
+            // 註解
             return (
                 <span className=" w-full flex justify-center items-center mt-1 ">
                     <span className=" !text-sm">
@@ -141,16 +155,18 @@ function PreviewArea({ width, displayId, expandLevel, initMdValue = '', only = f
             );
         },
         blockquote({ children }: { children: React.ReactNode }) {
+            // 引用塊
             return (
                 <blockquote className="rounded-sm border-l-[0.25em] pl-4 italic my-4">
                     {children}
                 </blockquote>
             );
         },
-        // code({ children, className, ...rest }: { children: React.ReactNode, className?: string }) {
-        code: ({ children, className, ...props }: { children: React.ReactNode, className: string }) => {
+        code({ children, className, ...props }: { children: React.ReactNode, className?: string }) {
+            // 多行代碼塊
             const match = /language-(\w+)/.exec(className || '')
             const th = getComputedStyle(document.documentElement).getPropertyValue("--code-theme") || "dark"
+
             return match ? (
                 <SyntaxHighlighter
                     {...props}
@@ -173,6 +189,7 @@ function PreviewArea({ width, displayId, expandLevel, initMdValue = '', only = f
                     }}
                 />
             ) : (
+                // 行內代碼
                 <code {...props} className={className}>
                     {children}
                 </code>
@@ -198,6 +215,7 @@ function PreviewArea({ width, displayId, expandLevel, initMdValue = '', only = f
 
             <div className={`preview-area-2 p-2 relative ${only ? "w-full flex justify-center" : ""}`}>
                 <div
+                    // onClick={}
                     style={{
                         scale: width / 850
                     }}
@@ -207,9 +225,22 @@ function PreviewArea({ width, displayId, expandLevel, initMdValue = '', only = f
                         components={components}
                         // @ts-ignore
                         rehypePlugins={[rehypeRaw, rehypeKatex, rehypeKatexNotranslate, rehypeCallouts]}
-                        // @ts-ignore
-                        remarkPlugins={[remarkMath, remarkGfm, [remarkExternalLinks, { target: '_blank', rel: 'noopener noreferrer' }]]}
-                    // remarkPlugins={[]}
+
+                        remarkPlugins={[
+                            remarkMath,
+                            [remarkHeadingNumbering,
+                                {
+                                    minDepth: mdHNConfig.minDepth,
+                                    maxDepth: mdHNConfig.maxDepth,
+                                    style: mdHNConfig.style,
+                                    separator: mdHNConfig.separator
+                                }],
+                            remarkGfm,
+                            // @ts-ignore
+                            [remarkExternalLinks,
+                                { target: '_blank', rel: 'noopener noreferrer' }
+                            ]
+                        ]}
                     >
                         {processMarkdown(mdValue)}
                     </Markdown>
@@ -220,8 +251,3 @@ function PreviewArea({ width, displayId, expandLevel, initMdValue = '', only = f
 }
 
 export default PreviewArea
-
-// .replace(
-//     /^\$\$[\n ]*(.*)[\n ]*\$\$/gm,
-//     '``` math\n$1\n```'
-// )

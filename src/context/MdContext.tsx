@@ -1,10 +1,13 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import DOC from '../pages/Doc.text?raw'
+import type { HeaderNumberConfig } from '../styleTypes';
+import DOC from '../pages/Doc.md?raw'
 
 interface MdContextType {
     mdValue: string,
     setMdValue: Function,
+    mdHNConfig: HeaderNumberConfig,
+    setMdHNConfig: Function,
 }
 
 const MdContext = createContext<MdContextType | undefined>(undefined);
@@ -33,8 +36,28 @@ export const MdProvider = ({ children }: { children: ReactNode; }) => {
         localStorage.setItem('mdValue', mdValue)
     }, [mdValue])
 
+    const [mdHNConfig, setMdHNConfig] = useState<HeaderNumberConfig>({ "minDepth": 2, "maxDepth": 4, "style": "dot", "separator": " " })
+
+    useEffect(() => {
+        const initialMdHNConfig = localStorage.getItem('mdHNConfig');
+        if (initialMdHNConfig) {
+            const parsedconfig = JSON.parse(initialMdHNConfig)
+            if (parsedconfig) {
+                setMdHNConfig(parsedconfig)
+            } else {
+                localStorage.setItem('mdHNConfig', '{"minDepth": 2,"maxDepth": 4,"style": "dot","separator": " "}')
+            }
+        } else {
+            localStorage.setItem('mdHNConfig', '{"minDepth": 2,"maxDepth": 4,"style": "dot","separator": " "}')
+        }
+    }, [])
+
+    useEffect(() => {
+        localStorage.setItem('mdHNConfig', JSON.stringify(mdHNConfig))
+    }, [mdHNConfig])
+
     return (
-        <MdContext.Provider value={{ mdValue, setMdValue }}>
+        <MdContext.Provider value={{ mdValue, setMdValue, mdHNConfig, setMdHNConfig }}>
             {children}
         </MdContext.Provider>
     );

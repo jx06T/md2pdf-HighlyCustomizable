@@ -1,7 +1,6 @@
 import { createRoot } from 'react-dom/client';
 
 function createConfirmDialog(title: string, message: string, onConfirm: Function, onCancel: Function, confirmText = "Confirm", cancelText = "Cancel"): void {
-    // console.log(onConfirm)
 
     const dialogRoot = document.createElement('div');
     document.body.appendChild(dialogRoot);
@@ -23,8 +22,8 @@ function createConfirmDialog(title: string, message: string, onConfirm: Function
 
         return (
             <div className="z-50 confirm-dialog-overlay flex justify-center fixed w-full top-36 left-1 right-1 px-4 pl-2">
-                <div className="confirm-dialog max-w-[92%]">
-                    <div className=' bg-blue-50 rounded-md rounded-b-none w-fit px-4 py-1 -mb-1 shadow-md shadow-blue-100 '><h1 className='text-xl underline decoration-purple-500'>{title}</h1></div>
+                <div className="confirm-dialog max-w-[92%] min-w-80">
+                    <div className=' bg-blue-50 rounded-md rounded-b-none w-fit px-4 py-1 -mb-1 shadow-md shadow-blue-100 '><h1 className='text-xl underline decoration-2 decoration-purple-500'>{title}</h1></div>
                     <div className='bg-blue-50 rounded-tl-none rounded-md p-4 px-5 min-h-40 flex-col flex justify-between shadow-md shadow-blue-100'>
                         <pre className=' text-wrap whitespace-pre-wrap px-3'>{message}</pre>
                         <div className=' w-full flex justify-end space-x-4'>

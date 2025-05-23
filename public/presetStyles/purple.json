@@ -1,5 +1,11 @@
 {
   "init": false,
+  "headerNumber": {
+    "minDepth": 2,
+    "maxDepth": 3,
+    "style": "dot",
+    "separator": " "
+  },
   "page": {
     "font": {
       "size": 18,

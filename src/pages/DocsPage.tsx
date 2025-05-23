@@ -3,7 +3,7 @@ import React, { Suspense, useState } from 'react'
 import { copyToClipboard } from '../utils/tool';
 import { IcBaselinePrint, MaterialSymbolsContentCopyOutlineRounded } from "../utils/Icons";
 
-import DOC from './Doc.text?raw'
+import DOC from './Doc.md?raw'
 
 const PreviewArea = React.lazy(() => import('../components/PreviewArea') as Promise<{ default: React.ComponentType<PreviewAreaProps> }>)
 const SetArea = React.lazy(() => import('../components/SetArea') as Promise<{ default: React.ComponentType<SetAreaProps> }>)
@@ -52,7 +52,7 @@ function DocsPage({ maxW }: { maxW: number }) {
                 }, 500);
             }} className="pb-2 rounded-md w-9 h-9"><MaterialSymbolsContentCopyOutlineRounded className={`text-2xl ${copied ? " text-green-700" : " text-black"} `}></MaterialSymbolsContentCopyOutlineRounded></button>
         </div>
-        {copied && <span className=" fixed top-40 right-3  text-black rounded-md h-6 !-ml-2 px-2 block">copied!</span>}
+        {copied && <span className=" fixed top-[9.5rem] right-4  text-black rounded-md h-6 !-ml-2 px-2 block z-30">copied!</span>}
 
         <PreviewArea
             width={Math.min(1024, maxW - 10)}
