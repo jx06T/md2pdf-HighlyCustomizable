@@ -264,7 +264,7 @@ function App() {
               />
             </Link>
             <div className=' mr-12 text-xl pt-[1px] space-x-4 text-blue-300'>
-              <a target="_blank" href='https://github.com/jx06T/md2pdf-highly_customizable' className=' bg-blue-500 px-2 py-1 rounded-b-md underline decoration-blue-300 underline-offset-1 cursor-pointer'> <TdesignLogoGithubFilled className=' inline-block mb-1 sm:mr-1 text-blue-300' /><span className=' hidden sm:inline'>Github</span></a>
+              <a target="_blank" href='https://github.com/jx06T/md2pdf-HighlyCustomizable' className=' bg-blue-500 px-2 py-1 rounded-b-md underline decoration-blue-300 underline-offset-1 cursor-pointer'> <TdesignLogoGithubFilled className=' inline-block mb-1 sm:mr-1 text-blue-300' /><span className=' hidden sm:inline'>Github</span></a>
               <Link to="/docs" className='bg-blue-500 px-2 py-1 rounded-b-md underline decoration-blue-300 underline-offset-1 cursor-pointer'><MaterialSymbolsDocsOutlineRounded className=' inline-block mb-1 sm:mr-1' /><span className=' hidden sm:inline'>Docs</span></Link>
             </div>
           </header>
