@@ -1,4 +1,5 @@
-import React, { useContext, useMemo, JSX } from 'react';
+import { useContext, useMemo } from 'react';
+import type { JSX } from 'react';
 import './Child.less';
 import Toolbar, { type IToolbarProps } from './';
 import { EditorContext } from '../../Context';

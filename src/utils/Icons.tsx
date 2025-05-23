@@ -1,5 +1,4 @@
-import React from "react"
-import { SVGProps } from 'react';
+import type { SVGProps } from 'react';
 
 export function IcBaselinePrint(props: SVGProps<SVGSVGElement>) {
   return (

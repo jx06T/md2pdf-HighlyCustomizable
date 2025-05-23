@@ -1,12 +1,13 @@
 import React, { useContext, useEffect } from 'react';
-import { IProps } from '../../Types';
-import { EditorContext, ExecuteCommandState } from '../../Context';
+import type { IProps } from '../../Types';
+import { EditorContext } from '../../Context';
+import type { ExecuteCommandState } from '../../Context';
 import { TextAreaCommandOrchestrator } from '../../commands';
 import handleKeyDown from './handleKeyDown';
 import shortcuts from './shortcuts';
 import './index.less';
 
-export interface TextAreaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'value'>, IProps {}
+export interface TextAreaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'value'>, IProps { }
 
 export default function Textarea(props: TextAreaProps) {
   const { prefixCls, onChange, ...other } = props;
@@ -20,7 +21,6 @@ export default function Textarea(props: TextAreaProps) {
     tabSize,
     defaultTabEnable,
     dispatch,
-    ...otherStore
   } = useContext(EditorContext);
   const textRef = React.useRef<HTMLTextAreaElement>(null);
   const executeRef = React.useRef<TextAreaCommandOrchestrator>(null);

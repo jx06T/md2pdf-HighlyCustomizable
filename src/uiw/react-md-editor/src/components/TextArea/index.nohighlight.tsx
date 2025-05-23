@@ -1,9 +1,13 @@
-import React, { useEffect, Fragment, useContext, JSX } from 'react';
-import { EditorContext, ContextStore, ExecuteCommandState } from '../../Context';
+import React, { useEffect, Fragment, useContext } from 'react';
+import type { JSX } from 'react';
+import { EditorContext } from '../../Context';
+import type { ContextStore, ExecuteCommandState } from '../../Context';
 import shortcuts from './shortcuts';
-import Textarea, { TextAreaProps } from './Textarea';
-import { IProps } from '../../Types';
-import { TextAreaCommandOrchestrator, ICommand } from '../../commands';
+import Textarea from './Textarea';
+import type { TextAreaProps } from './Textarea';
+import type { IProps } from '../../Types';
+import { TextAreaCommandOrchestrator } from '../../commands';
+import type { ICommand } from '../../commands';
 import './index.less';
 
 type RenderTextareaHandle = {
@@ -25,7 +29,7 @@ type RenderTextareaHandle = {
 
 export interface ITextAreaProps
   extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'value' | 'onScroll'>,
-    IProps {
+  IProps {
   value?: string;
   onScroll?: (e: React.UIEvent<HTMLDivElement>) => void;
   renderTextarea?: (
