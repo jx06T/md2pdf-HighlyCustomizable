@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useMemo, useRef, useImperativeHandle, Fragment } from 'react';
+import React, { useEffect, useReducer, useMemo, useRef, useImperativeHandle } from 'react';
 // import MarkdownPreview from '../../react-markdown-preview';
 import TextArea from './components/TextArea';
 import { ToolbarVisibility } from './components/Toolbar';

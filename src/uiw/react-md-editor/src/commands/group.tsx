@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { ICommand, ICommandChildCommands, ICommandChildHandle } from './';
 
 export type GroupOptions = Omit<ICommand<string>, 'children'> & {

@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { ContextStore, ExecuteCommandState } from '../Context';
 import { insertTextAtPosition } from '../utils/InsertTextAtPosition';
 import { bold } from './bold';

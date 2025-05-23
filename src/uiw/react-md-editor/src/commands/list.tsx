@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { ICommand, ExecuteState, TextAreaTextApi } from './';
 import {
   selectWord,
@@ -82,7 +82,7 @@ export const orderedListCommand: ICommand = {
     </svg>
   ),
   execute: (state: ExecuteState, api: TextAreaTextApi) => {
-    makeList(state, api, (item, index) => `${index + 1}. `);
+    makeList(state, api, (_, index) => `${index + 1}. `);
   },
 };
 
@@ -101,6 +101,6 @@ export const checkedListCommand: ICommand = {
     </svg>
   ),
   execute: (state: ExecuteState, api: TextAreaTextApi) => {
-    makeList(state, api, (item, index) => `- [ ] `);
+    makeList(state, api, (_, __) => `- [ ] `);
   },
 };

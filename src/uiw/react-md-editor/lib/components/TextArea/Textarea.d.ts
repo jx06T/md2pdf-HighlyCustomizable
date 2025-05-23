@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { IProps } from '../../Types';
 import './index.less';
 export interface TextAreaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'value'>, IProps {

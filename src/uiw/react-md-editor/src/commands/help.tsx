@@ -1,5 +1,5 @@
-import React from 'react';
-import { ICommand, ExecuteState, TextAreaTextApi } from './';
+// import React from 'react';
+import { ICommand } from './';
 
 export const help: ICommand = {
   name: 'help',

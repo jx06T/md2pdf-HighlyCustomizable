@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { IProps } from '../../Types';
 export interface MarkdownProps extends IProps, React.HTMLAttributes<HTMLPreElement> {
 }

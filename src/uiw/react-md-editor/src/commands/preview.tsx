@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { ICommand, TextState, TextAreaTextApi } from './';
 import { ContextStore, ExecuteCommandState } from '../Context';
 
@@ -21,7 +21,7 @@ export const codePreview: ICommand = {
     </svg>
   ),
   execute: (
-    state: TextState,
+    _: TextState,
     api: TextAreaTextApi,
     dispatch?: React.Dispatch<ContextStore>,
     executeCommandState?: ExecuteCommandState,
@@ -50,7 +50,7 @@ export const codeEdit: ICommand = {
     </svg>
   ),
   execute: (
-    state: TextState,
+    _: TextState,
     api: TextAreaTextApi,
     dispatch?: React.Dispatch<ContextStore>,
     executeCommandState?: ExecuteCommandState,
@@ -79,7 +79,7 @@ export const codeLive: ICommand = {
     </svg>
   ),
   execute: (
-    state: TextState,
+    _: TextState,
     api: TextAreaTextApi,
     dispatch?: React.Dispatch<ContextStore>,
     executeCommandState?: ExecuteCommandState,

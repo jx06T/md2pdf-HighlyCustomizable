@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import MarkdownPreview from '@uiw/react-markdown-preview/nohighlight';
 import { ContextStore } from './Context';
 import type { MDEditorProps } from './Types';

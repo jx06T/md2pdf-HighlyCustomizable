@@ -1,4 +1,4 @@
-import React, { JSX } from 'react';
+import  { JSX } from 'react';
 import { ContextStore, ExecuteCommandState } from '../../Context';
 import { TextAreaProps } from './Textarea';
 import { IProps } from '../../Types';
