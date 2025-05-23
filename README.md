@@ -1,54 +1,133 @@
-# React + TypeScript + Vite
+# md2pdf - HighlyCustomizable
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+###### _version-V1.3.0_
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![logo](/public/logo192.png)
 
-## Expanding the ESLint configuration
+> [!NOTE]
+> 此儲存庫是來自我之前的專案 [jx06T/md2pdf-highly_customizable](https://github.com/jx06T/md2pdf-highly_customizable/tree/main) ，基於 **Vite** 重構並修復錯誤以及增加新功能的版本 
+>
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 簡介&功能
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- 工具網址 [https://md2pdf-jx.vercel.app/](https://md2pdf-jx.vercel.app/)
+- 上方導覽列有 **Github 儲存庫連結**以及**說明文檔**，右側按鈕可收合或開啟
+- 下方有三個分頁（**移動裝置預設收合**），展開狀態的分頁可以透過其右側箭頭收合，同理向右箭頭能展開收合的分頁
+- 拖動分頁中間的分隔線可調整頁面布局
+- 最右方有兩個按鈕
+  - 列印文件：將文件轉為 **PDF** 建議在 **電腦** 上使用此功能，避免文字重影或其他錯誤
+  - 複製純文字格式：將左側編輯器內容直接**複製到剪貼簿**
+- 編輯區：
+  - 上方有一些 **markdown 語法** 的基本快速操作按鈕
+  - 下方為編輯區，來自 **uiwjs** 的 [react-md-editor](https://github.com/uiwjs/react-md-editor)
+  - 支援常見快捷鍵，例如 **ctrl+B 粗體**、_ctrl+I 斜體_ 等等其他快捷鍵參見 [react-md-editor](https://github.com/uiwjs/react-md-editor) 文檔
+- 中間為文件樣式設定區
+  - 頁面設置
+    - **字型**: 設定字型大小、字型樣式、裝飾顏色、字型顏色及行高等屬性。
+    - **佈局**: 包括頁面背景色、文件名、頁面邊界、統一縮放文字等。
+  - 標題樣式
+    - **H1 到 H6**: 設定標題層級的字型大小、字重、邊距、顏色及下劃線顏色等。
+  - 列表樣式
+    - **有序列表**: 設定各層級的縮排及符號樣式。
+    - **無序列表**: 設定各層級的縮排及符號樣式。
+    - **任務列表**: 設定任務清單項目的樣式。
+  - 圖片樣式
+    - **圖片**: 設定圖片的圓角、對齊方式、邊距等屬性。
+  - 引用樣式
+    - **引用**: 設定引用文字的顏色、背景色、邊距等屬性。
+  - 代碼樣式
+    - **行內代碼**: 設定行內代碼的背景顏色。
+    - **代碼區塊**: 設定代碼區塊的背景顏色及上下邊距，並且支持語法高亮主題設置。
+  - 表格樣式
+    - **表格標題顏色**: 設定表格標題顏色、表格行單雙數行的顏色、邊框顏色、文字對齊方式等屬性。
+  - 標題編號
+    - **最大最小層級**: 設定需計算標題編號的層級
+    - **樣式**: 中英文標號切換等等
+    - **分隔符號**: 設定編號和原始標題中間的分隔符號
+
+- 右側為預覽區域
+  - 淺藍色框代表 **A4** 紙張範圍，但會因為裝置的不同行為有誤差。
+
+### [詳細說明請見網站文檔頁面](https://md2pdf-jx.vercel.app/docs)
+
+## 更新紀錄
+
+### 1.3
+```
+1.3.0
+遷移至**vite**重構
+修復編輯區延遲問題
+增加統一文字縮放功能
+增加標題自動編號功能
+統一代碼風格與組件位置
+
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 1.2
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```
+1.2.3
+縮排錯誤
+強制分頁符號修改
+程式碼方塊中的錯誤自訂轉譯修復
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+1.2.2
+忘記了
+
+1.2.1
+修復表格圓角
+新增標題置中選項
+修改待辦清單樣式與顏色
+增加預設樣式 "purple"
+新增彈出確認框
+改善響應式布局
+
+1.2.1
+新增文檔與 README.md
+修復分頁標籤無法點擊之錯誤
+
+1.2.0
+新增網站圖標
+完成所有樣式設定介面
+新增樣式匯出匯入與重置功能
+修復字體無法載入錯誤
+修復中英文字體衝突錯誤
+
+```
+
+### 1.1
+
+```
+1.1.2
+調整編輯區按鈕大小
+修復紙張大小參考線對齊錯誤
+新增圖片、表格與程式碼塊下方之註解語法
+新增表格、程式碼區塊、圖片等樣式設定
+
+1.1.1
+新增 callout 語法支援
+新增 Katex 語法支援
+新增基礎程式碼高亮功能
+
+
+1.1.0
+完成預覽區域與編輯區功能與樣式
+完成基本文件樣式設定區
+新增強制分頁符號
+
+```
+
+### 1.0
+
+```
+1.0.1
+編輯區樣式修改
+完成移動裝置頁面部局
+修改分頁標籤顯示方式
+
+1.0.0
+完成電腦頁面部局
+
 ```
