@@ -203,7 +203,7 @@ function PreviewArea({ width, displayId, expandLevel, initMdValue = '', only = f
     }
 
     useEffect(() => {
-        const regex = /\[root-path\]:\((.*?)\)/;
+        const regex = /\[root-path\] *: *\((.*?)\)/;
         const match = mdValue.match(regex);
         if (match) {
             setRootPath(match[1]);
