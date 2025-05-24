@@ -1,12 +1,13 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { HeaderNumberConfig } from '../styleTypes';
+import type { CodeAndHeaderNumberConfig } from '../styleTypes';
 import DOC from '../pages/Doc.md?raw'
+
 
 interface MdContextType {
     mdValue: string,
     setMdValue: Function,
-    mdHNConfig: HeaderNumberConfig,
+    mdHNConfig: CodeAndHeaderNumberConfig,
     setMdHNConfig: Function,
 }
 
@@ -36,7 +37,7 @@ export const MdProvider = ({ children }: { children: ReactNode; }) => {
         localStorage.setItem('mdValue', mdValue)
     }, [mdValue])
 
-    const [mdHNConfig, setMdHNConfig] = useState<HeaderNumberConfig>({ "minDepth": 2, "maxDepth": 4, "style": "dot", "separator": " " })
+    const [mdHNConfig, setMdHNConfig] = useState<CodeAndHeaderNumberConfig>({ "minDepth": 2, "maxDepth": 4, "style": "dot", "separator": " " , "codeTheme": "dark"})
 
     useEffect(() => {
         const initialMdHNConfig = localStorage.getItem('mdHNConfig');
@@ -45,10 +46,10 @@ export const MdProvider = ({ children }: { children: ReactNode; }) => {
             if (parsedconfig) {
                 setMdHNConfig(parsedconfig)
             } else {
-                localStorage.setItem('mdHNConfig', '{"minDepth": 2,"maxDepth": 4,"style": "dot","separator": " "}')
+                localStorage.setItem('mdHNConfig', '{"minDepth": 2,"maxDepth": 4,"style": "dot","separator": " ", "codeTheme": "dark"}')
             }
         } else {
-            localStorage.setItem('mdHNConfig', '{"minDepth": 2,"maxDepth": 4,"style": "dot","separator": " "}')
+            localStorage.setItem('mdHNConfig', '{"minDepth": 2,"maxDepth": 4,"style": "dot","separator": " ", "codeTheme": "dark"}')
         }
     }, [])
 

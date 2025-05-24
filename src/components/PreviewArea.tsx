@@ -165,7 +165,6 @@ function PreviewArea({ width, displayId, expandLevel, initMdValue = '', only = f
         code({ children, className, ...props }: { children: React.ReactNode, className?: string }) {
             // 多行代碼塊
             const match = /language-(\w+)/.exec(className || '')
-            const th = getComputedStyle(document.documentElement).getPropertyValue("--code-theme") || "dark"
 
             return match ? (
                 <SyntaxHighlighter
@@ -175,7 +174,7 @@ function PreviewArea({ width, displayId, expandLevel, initMdValue = '', only = f
                     language={match[1]}
                     showLineNumbers={true}
                     // showInlineLineNumbers={true}
-                    style={getThemeStyle(th)}
+                    style={getThemeStyle(mdHNConfig.codeTheme || "dark")}
                     wrapLines={true}
 
                     lineNumberStyle={{ color: '#888', paddingRight: '10px' }}

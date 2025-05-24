@@ -126,7 +126,12 @@ interface StyleConfig {
 }
 
 
+type CodeAndHeaderNumberConfig = HeaderNumberConfig & {
+    codeTheme?: string;
+};
+
 export type {
+    CodeAndHeaderNumberConfig,
     StyleConfig,
     PageConfig,
     HeaderConfig,

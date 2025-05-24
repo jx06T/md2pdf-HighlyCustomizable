@@ -72,6 +72,10 @@ const StyleConfigPanel = () => {
             setMdHNConfig({ ...mdHNConfig, [path[1]]: value })
         }
 
+        if (path[0] == "code", path[1] == "theme") {
+            setMdHNConfig({ ...mdHNConfig, codeTheme: value })
+        }
+
 
         if (typeof value === "number") {
             if (path.includes("layout")) {
