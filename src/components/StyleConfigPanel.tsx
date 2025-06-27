@@ -162,7 +162,7 @@ const StyleConfigPanel = () => {
         if (initialconfig) {
             const parsedconfig = JSON.parse(initialconfig);
             setConfig({ ...parsedconfig, init: false })
-            console.log(parsedconfig)
+            // console.log(parsedconfig)
             initializeConfigStyles(parsedconfig);
         } else {
             localStorage.setItem('config', JSON.stringify(defaultStyleConfig))
