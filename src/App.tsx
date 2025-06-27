@@ -285,6 +285,9 @@ function App() {
           <Routes>
             <Route path="/" element={
               <>
+                <noscript>
+                  <div>請啟用 JavaScript 來獲得最佳體驗</div>
+                </noscript>
                 <div
                   style={{
                     scale: (expandLevel > 1 ? maxW - editorAndSetAreaW : (expandLevel > 0 ? maxW - editorAreaW : maxW)) / 850,

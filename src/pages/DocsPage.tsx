@@ -2,11 +2,14 @@ import React, { Suspense, useState } from 'react'
 
 import { copyToClipboard } from '../utils/tool';
 import { IcBaselinePrint, MaterialSymbolsContentCopyOutlineRounded } from "../utils/Icons";
+import useStyleConfigInit from "../utils/useStyleConfigInit";
 
 import DOC from './Doc.md?raw'
 
+import defaultStyleConfigJson from "../components/default.json";
+const defaultStyleConfig = defaultStyleConfigJson;
+
 const PreviewArea = React.lazy(() => import('../components/PreviewArea') as Promise<{ default: React.ComponentType<PreviewAreaProps> }>)
-const SetArea = React.lazy(() => import('../components/SetArea') as Promise<{ default: React.ComponentType<SetAreaProps> }>)
 
 interface PreviewAreaProps {
     width: number
@@ -16,11 +19,6 @@ interface PreviewAreaProps {
     only?: boolean
 }
 
-interface SetAreaProps {
-    displayId: number
-    expandLevel: number
-    width: number
-}
 
 const LoadingSpinner: React.FC = () => (
     <div className="flex items-center justify-center h-full w-full">
@@ -30,17 +28,9 @@ const LoadingSpinner: React.FC = () => (
 
 function DocsPage({ maxW }: { maxW: number }) {
     const [copied, setCopied] = useState<boolean>(false);
-
+    useStyleConfigInit(defaultStyleConfig);
     return (<Suspense fallback={<LoadingSpinner />}>
-        <div className=' fi pointer-events-none opacity-0 w-0 h-0 overflow-hidden'>
-            <Suspense fallback={<LoadingSpinner />}>
-                <SetArea
-                    displayId={2}
-                    expandLevel={2}
-                    width={0}
-                />
-            </Suspense>
-        </div>
+  
 
         <div className=' doc-tool fixed top-16 right-4 sm:right-8 w-10 z-30 bg-slate-200 p-2 pb-1 rounded-md'>
             <button onClick={() => window.print()} className="pb-2 rounded-md w-9 h-9 "><IcBaselinePrint className="text-2xl"></IcBaselinePrint></button>
