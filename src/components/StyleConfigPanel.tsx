@@ -191,6 +191,9 @@ const StyleConfigPanel = () => {
     };
 
     const handleImportConfig = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!event || !event.target) {
+            return
+        }
         const file = event.target.files?.[0];
         if (file) {
             const reader = new FileReader();
@@ -975,8 +978,8 @@ const StyleConfigPanel = () => {
                         <input
                             type="file"
                             accept=".json"
-                            onChange={() => {
-                                createConfirmDialog("Import Config？", "This will override all current styles.", handleImportConfig, () => { }, "Import")
+                            onChange={(e) => {
+                                createConfirmDialog("Import Config？", "This will override all current styles.", () => handleImportConfig(e), () => { }, "Import")
                             }}
                             className="hidden"
                         />
