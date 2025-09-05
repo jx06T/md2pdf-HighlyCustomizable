@@ -1,6 +1,6 @@
 # md2pdf - HighlyCustomizable
 
-###### _version-V1.3.0_
+###### _version-V1.3.1_
 
 ---
 
