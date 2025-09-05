@@ -1,8 +1,7 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { NumberInput, ColorInput, StringInput, SelectInput, HSelectInput, BooleanInput, StyleSelector, Section } from './AllInput';
 
 import type { StyleConfig } from '../styleTypes';
-
 
 import defaultStyleConfigJson from "./default.json"
 import createConfirmDialog from '../utils/ConfirmDialog';
@@ -32,21 +31,28 @@ const TextScaler = ({ scale }: { scale: Function }) => {
                     Apply
                 </button>
             </div>
-
         </div >
     )
 }
 
-
-// 主組件
 const StyleConfigPanel = () => {
-    const [config, setConfig] = useState(defaultStyleConfig);
-    let { setMdHNConfig, mdHNConfig } = useMdContext()
-
-    const [headingToConfigure, setHeadingToConfigure] = useState<string>('H1');
-
-    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    const [config, setConfig] = useState<StyleConfig>(() => {
+        const savedConfig = localStorage.getItem('config');
+        if (savedConfig) {
+            try {
+                return JSON.parse(savedConfig) as StyleConfig;
+            } catch (e) {
+                console.error("Failed to parse config from localStorage", e);
+                return defaultStyleConfig;
+            }
+        }
+        return defaultStyleConfig;
     });
+
+    const isInitialMount = useRef(true);
+    let { setMdHNConfig, mdHNConfig } = useMdContext();
+    const [headingToConfigure, setHeadingToConfigure] = useState<string>('H1');
+    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
     const toggleSection = (section: string) => {
         setExpandedSections(prev => ({
@@ -64,18 +70,17 @@ const StyleConfigPanel = () => {
         }
         current[path[path.length - 1]] = value;
 
-        if (path[path.length - 1] == "title") {
+        if (path[path.length - 1] === "title") {
             document.title = value;
         }
 
-        if (path[0] == "headerNumber") {
+        if (path[0] === "headerNumber") {
             setMdHNConfig({ ...mdHNConfig, [path[1]]: value })
         }
 
-        if (path[0] == "code", path[1] == "theme") {
+        if (path[0] === "code" && path[1] === "theme") {
             setMdHNConfig({ ...mdHNConfig, codeTheme: value })
         }
-
 
         if (typeof value === "number") {
             if (path.includes("layout")) {
@@ -88,8 +93,7 @@ const StyleConfigPanel = () => {
         }
 
         setConfig(newConfig);
-    }, [config, setConfig]);
-
+    }, [config, mdHNConfig, setMdHNConfig]);
 
     const textSizePaths = [
         ['page', 'font', 'size'],
@@ -107,7 +111,6 @@ const StyleConfigPanel = () => {
         ['list', 'task', 'scaling'],
     ];
 
-    // 縮放函數
     const scale = useCallback((multiple: number) => {
         textSizePaths.forEach(path => {
             let current: any = config;
@@ -123,20 +126,15 @@ const StyleConfigPanel = () => {
         });
     }, [config, updateConfig]);
 
-
-
-    const initializeConfigStyles = useCallback((config: Record<string, any>, basePath: string[] = []) => {
+    const initializeConfigStyles = useCallback((configToApply: StyleConfig) => {
         const traverseConfig = (currentConfig: Record<string, any>, currentPath: string[]) => {
             Object.entries(currentConfig).forEach(([key, value]) => {
                 const newPath = [...currentPath, key];
-
-
                 if (typeof value === "object" && value !== null) {
-                    traverseConfig(value, newPath); // 遞迴
+                    traverseConfig(value, newPath);
                 } else {
                     const cssVarName = `--${newPath.join('-')}`;
-
-                    if (newPath[newPath.length - 1] == "title") {
+                    if (newPath[newPath.length - 1] === "title") {
                         document.title = value;
                     }
 
@@ -152,30 +150,20 @@ const StyleConfigPanel = () => {
                 }
             });
         };
-
-        traverseConfig(config, basePath);
+        traverseConfig(configToApply, []);
     }, []);
 
+    useEffect(() => {
+        initializeConfigStyles(config);
+    }, []);
 
     useEffect(() => {
-        const initialconfig = localStorage.getItem('config');
-        if (initialconfig) {
-            const parsedconfig = JSON.parse(initialconfig);
-            setConfig({ ...parsedconfig, init: false })
-            // console.log(parsedconfig)
-            initializeConfigStyles(parsedconfig);
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
         } else {
-            localStorage.setItem('config', JSON.stringify(defaultStyleConfig))
+            localStorage.setItem('config', JSON.stringify(config));
         }
-    }, [])
-
-    useEffect(() => {
-        if (config.init) {
-            return
-        }
-        localStorage.setItem('config', JSON.stringify(config))
-    }, [config])
-
+    }, [config]);
 
     const handleExportConfig = () => {
         const dataStr = JSON.stringify(config, null, 2);
@@ -192,7 +180,7 @@ const StyleConfigPanel = () => {
 
     const handleImportConfig = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (!event || !event.target) {
-            return
+            return;
         }
         const file = event.target.files?.[0];
         if (file) {
@@ -200,7 +188,7 @@ const StyleConfigPanel = () => {
             reader.onload = (e) => {
                 try {
                     const importedConfig = JSON.parse(e.target?.result as string);
-                    setConfig({ ...importedConfig, init: false });
+                    setConfig(importedConfig);
                     initializeConfigStyles(importedConfig);
                     localStorage.setItem('config', JSON.stringify(importedConfig));
                 } catch (error) {
@@ -212,11 +200,10 @@ const StyleConfigPanel = () => {
     };
 
     const handleReset = (newStyleConfig: StyleConfig) => {
-        setConfig({ ...newStyleConfig, init: false });
+        setConfig(newStyleConfig);
         initializeConfigStyles(newStyleConfig);
         localStorage.setItem('config', JSON.stringify(newStyleConfig));
     };
-
     return (
         <div className="w-full bg-blue-50 p-4 overflow-y-auto h-full">
             <Section

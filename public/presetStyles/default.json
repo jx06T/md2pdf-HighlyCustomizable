@@ -1,5 +1,4 @@
 {
-  "init": true,
   "headerNumber": {
     "minDepth": 2,
     "maxDepth": 3,
