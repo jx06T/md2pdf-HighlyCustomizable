@@ -71,7 +71,7 @@ const StyleConfigPanel = () => {
         current[path[path.length - 1]] = value;
 
         if (path[path.length - 1] === "title") {
-            document.title = value;
+            document.title = value+" | md2pdf-jx";
         }
 
         if (path[0] === "headerNumber") {
@@ -135,7 +135,7 @@ const StyleConfigPanel = () => {
                 } else {
                     const cssVarName = `--${newPath.join('-')}`;
                     if (newPath[newPath.length - 1] === "title") {
-                        document.title = value;
+                        document.title = value+" | md2pdf-jx";
                     }
 
                     if (typeof value === "number") {

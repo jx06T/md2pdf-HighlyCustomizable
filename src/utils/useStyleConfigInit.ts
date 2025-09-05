@@ -9,8 +9,9 @@ function useStyleConfigInit(defaultConfig: StyleConfig, localStorageKey = "confi
       Object.entries(currentConfig).forEach(([key, value]) => {
         const newPath = [...currentPath, key];
         const cssVarName = `--${newPath.join("-")}`;
-
-        if (newPath[newPath.length - 1] === "title") {
+        
+        // console.log(value,newPath,newPath[newPath.length-1])
+        if (newPath[newPath.length - 1] === "title"&& typeof value === "string") {
           document.title = value;
         }
 
